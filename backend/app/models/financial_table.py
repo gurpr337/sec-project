@@ -5,6 +5,11 @@ from sqlalchemy.orm import relationship
 from ..database import Base
 
 class FinancialTable(Base):
+    """
+    Represents an extracted financial table from an SEC filing.
+    Stores table-level metadata, content structure, and its vector embedding 
+    for local semantic retrieval via pgvector.
+    """
     __tablename__ = 'financial_tables'
     __table_args__ = {'schema': 'sec_app'}
 
@@ -15,8 +20,9 @@ class FinancialTable(Base):
     title = Column(String)
     currency = Column(String)
     unit = Column(String)
-    embedding = Column(Vector(3072))
+    embedding = Column(Vector(3072))  # Embedding for pgvector-based similarity search
 
+    # Relationships
     document = relationship("Document", back_populates="financial_tables")
     table_group = relationship("FinancialTableGroup", back_populates="financial_tables")
     column_headers = relationship("ColumnHeader", back_populates="table")
