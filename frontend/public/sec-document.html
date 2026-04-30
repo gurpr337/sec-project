@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEC Document Viewer</title>
+    <style>
+        .highlighted-cell {
+            background-color: yellow !important;
+            border: 2px solid red !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const documentUrl = urlParams.get('url');
+        const row = parseInt(urlParams.get('row'), 10);
+        const col = parseInt(urlParams.get('col'), 10);
+        const text = urlParams.get('text');
+
+        if (documentUrl) {
+            fetch(`http://127.0.0.1:8000/api/proxy?url=${encodeURIComponent(documentUrl)}`)
+                .then(response => response.text())
+                .then(html => {
+                    const container = document.getElementById('container');
+                    container.innerHTML = html;
+                    
+                    const base = document.createElement('base');
+                    base.href = documentUrl.substring(0, documentUrl.lastIndexOf('/') + 1);
+                    document.head.appendChild(base);
+
+                    setTimeout(() => {
+                        const tables = container.querySelectorAll('table');
+                        let targetCell;
+                        
+                        const normalize = (s) => {
+                            if (!s) return '';
+                            let normalized = s.trim();
+                            if (normalized.startsWith('(') && normalized.endsWith(')')) {
+                                normalized = '-' + normalized.substring(1, normalized.length - 1);
+                            }
+                            return normalized.replace(/[$,\s]/g, '');
+                        };
+
+                        const searchText = normalize(text);
+
+                        for (let table of tables) {
+                            if (table.rows.length > row && table.rows[row].cells.length > col) {
+                                const cell = table.rows[row].cells[col];
+                                const cellText = normalize(cell.textContent);
+                                
+                                if (cellText.includes(searchText)) {
+                                    targetCell = cell;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (targetCell) {
+                            targetCell.classList.add('highlighted-cell');
+                            targetCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 500);
+                })
+                .catch(err => {
+                    document.getElementById('container').innerText = 'Failed to load document.';
+                    console.error(err);
+                });
+        }
+    </script>
+</body>
+</html>

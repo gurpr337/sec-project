@@ -1,0 +1,28 @@
+version: '3'
+
+tasks:
+  run:
+    desc: Run the backend server
+    cmds:
+      - source venv/bin/activate && python run.py
+
+  wipe-db:
+    desc: Wipe all data from PostgreSQL database
+    cmds:
+      - source venv/bin/activate && python wipe_postgres.py
+
+  install:
+    desc: Install dependencies
+    cmds:
+      - pip install -r requirements.txt
+
+  setup:
+    desc: Setup the environment
+    cmds:
+      - python -m venv venv
+      - source venv/bin/activate && pip install -r requirements.txt
+
+  generate-sigma:
+    desc: Generate and populate the sigma table from existing data
+    cmds:
+      - source venv/bin/activate && python populate_sigma.py
