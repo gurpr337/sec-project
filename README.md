@@ -72,7 +72,7 @@ graph TD
 - **Python 3.8+** (for backend)
 - **Node.js 16+** (for frontend)
 - **PostgreSQL** database (for data storage)
-- **SEC API key** (from [sec-api.com](https://sec-api.com))
+- **SEC API key** (from [sec-api.io](https://sec-api.io))
 - **Pinecone API key** (from [pinecone.io](https://pinecone.io))
 - **Google Cloud credentials** for Vertex AI (for embeddings)
 
